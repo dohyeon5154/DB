@@ -30,9 +30,9 @@
     </ul>
 
     <script>
-      const SUPABASE_URL = "";
+      const SUPABASE_URL = "YOUR_SUPABASE_URL";
       const SUPABASE_ANON_KEY =
-        "";
+        "YOUR_SUPABASE_ANON_KEY";
 
       const supabaseClient = supabase.createClient(
         SUPABASE_URL,
@@ -56,7 +56,6 @@
         }
 
         document.getElementById("user-info").innerText = `로그인 성공! (${data.user.email})`;
-        
         // 로그인 성공 후 내 문서 불러오기 실행
         loadDocuments();
       }
@@ -69,7 +68,7 @@
         // RLS가 켜져 있으면, 현재 로그인한 유저의 세션(토큰)을 자동으로 사용합니다.
         const { data, error } = await supabaseClient
           .from("documents")
-          .select("*");
+          .select("id, title, chunks(content)");
 
         listEl.innerHTML = "";
 
@@ -86,7 +85,9 @@
         data.forEach((doc) => {
           const li = document.createElement("li");
           li.style.marginBottom = "10px";
-          li.innerHTML = `<strong>[ID: ${doc.id}] ${doc.title}</strong><br>${doc.content}`;
+          // chunks는 document_id로 연결된 내용들의 배열로 들어옵니다.
+          const contents = doc.chunks.map((chunk) => chunk.content).join("<br>");
+          li.innerHTML = `<strong>[ID: ${doc.id}] ${doc.title}</strong><br>${contents || "(내용 없음)"}`;
           listEl.appendChild(li);
         });
       }
